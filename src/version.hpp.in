@@ -1,0 +1,25 @@
+/** @file
+ * @brief バージョン情報
+ * @author Demiquartz
+ * @copyright (c) 2021 Demiquartz &lt;info@demiquartz.jp&gt; @n
+ * Distributed under the MIT License (See accompanying file LICENSE
+ * or copy at https://opensource.org/licenses/MIT)
+ */
+#ifndef GRAPHENE_VERSION_HPP
+#define GRAPHENE_VERSION_HPP
+
+/// システム名
+#define SYSNAME  "${SysString}"
+/// バージョン文字列
+#define VERSION  "${VerString}"
+/// リビジョン文字列
+#define REVISION "${RevString}"
+
+/// メジャーバージョン番号
+#define VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
+/// マイナーバージョン番号
+#define VERSION_MINOR ${PROJECT_VERSION_MINOR}
+/// パッチバージョン番号
+#define VERSION_PATCH ${PROJECT_VERSION_PATCH}
+
+#endif // GRAPHENE_VERSION_HPP

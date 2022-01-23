@@ -1,0 +1,7 @@
+.vscode/
+bin/
+build/
+doc/
+lib/
+version.hpp
+Doxyfile
