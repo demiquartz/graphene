@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.21)
 
 execute_process(COMMAND git describe --tags --abbrev=0        RESULT_VARIABLE VerResult OUTPUT_VARIABLE VerString ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND git describe --tags --abbrev=7 --long RESULT_VARIABLE RevResult OUTPUT_VARIABLE RevString ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -16,8 +16,8 @@ endif()
 project(${SysString} VERSION ${VerString})
 set(PROJECT_BRIEF "Cross platform 2d game engine")
 
-configure_file(version.hpp.in ${PROJECT_SOURCE_DIR}/../include/${PROJECT_NAME}/version.hpp)
-configure_file(../Doxyfile.in ${PROJECT_SOURCE_DIR}/../Doxyfile)
+set(PROJECT_RESOURCES
+)
 
 if(WIN32)
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -35,6 +35,19 @@ else(WIN32)
     endif()
 endif(WIN32)
 
+set(PROJECT_OBJECTS "")
+set(WORKPATH ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}.dir)
+
+foreach(RESOURCE ${PROJECT_RESOURCES})
+    add_custom_command(OUTPUT ${WORKPATH}/${RESOURCE}.o WORKING_DIRECTRY ${PROJECT_SOURCE_DIR}
+        COMMAND ${CMAKE_OBJCOPY} ${OBJCOPY_FLAGS} ${RESOURCE} ${WORKPATH}/${RESOURCE}.o
+    )
+    list(APPEND PROJECT_OBJECTS ${WORKPATH}/${RESOURCE}.o)
+endforeach(RESOURCE)
+
+configure_file(version.hpp.in ${PROJECT_SOURCE_DIR}/../include/${PROJECT_NAME}/version.hpp)
+configure_file(../Doxyfile.in ${PROJECT_SOURCE_DIR}/../Doxyfile)
+
 # add_executable(${PROJECT_NAME})
 add_library(${PROJECT_NAME} STATIC)
 # add_library(${PROJECT_NAME} SHARED)
@@ -42,8 +55,11 @@ add_library(${PROJECT_NAME} STATIC)
 set_target_properties(${PROJECT_NAME}
 PROPERTIES
     CXX_EXTENSIONS NO
+    LINK_FLAGS_RELEASE -s -static
+    IMPORTED_OBJECTS ${PROJECT_OBJECTS}
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../bin
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../lib
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../lib
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -61,7 +77,6 @@ PRIVATE
 
 target_link_options(${PROJECT_NAME}
 PRIVATE
-    $<$<CONFIG:Release>:-static>
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -70,7 +85,7 @@ PRIVATE
 
 target_compile_features(${PROJECT_NAME}
 PRIVATE
-    c_std_11
+    c_std_17
     cxx_std_20
 )
 
