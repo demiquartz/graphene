@@ -5,8 +5,8 @@
  * Distributed under the MIT License (See accompanying file LICENSE
  * or copy at https://opensource.org/licenses/MIT)
  */
-#include <graphene/version.hpp>
 #include <graphene/graphics/window.hpp>
+#include "../version.hpp"
 
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
