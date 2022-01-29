@@ -1,0 +1,28 @@
+/** @file
+ * @brief ビルドコンフィグ
+ * @author Takaaki Sato
+ * @copyright (c) 2022 Demiquartz &lt;info@demiquartz.jp&gt; @n
+ * Distributed under the MIT License (See accompanying file LICENSE
+ * or copy at https://opensource.org/licenses/MIT)
+ */
+#ifndef GRAPHENE_CONFIG_HPP
+#define GRAPHENE_CONFIG_HPP
+
+// コンポーネントとしてGLFWを使用
+#cmakedefine01 USE_GLFW
+
+// 使用可能なウィンドウシステムを定義
+#cmakedefine01 WINDOW_SYSTEM_WIN32
+#cmakedefine01 WINDOW_SYSTEM_X11
+
+// 環境に応じて必要なマクロを定義
+#if USE_GLFW
+#if WINDOW_SYSTEM_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+#if WINDOW_SYSTEM_X11
+#define GLFW_EXPOSE_NATIVE_X11
+#endif
+#endif
+
+#endif // GRAPHENE_CONFIG_HPP
