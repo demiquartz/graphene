@@ -26,37 +26,42 @@ if(WIN32)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(OBJCOPY_FLAGS -I binary -O pe-x86-64    -B i386)
     endif()
-else(WIN32)
+else()
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(OBJCOPY_FLAGS -I binary -O elf32-i386   -B i386)
     endif()
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(OBJCOPY_FLAGS -I binary -O elf64-x86-64 -B i386)
     endif()
-endif(WIN32)
+endif()
 
 set(PROJECT_OBJECTS "")
 set(WORKPATH ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}.dir)
-
 foreach(RESOURCE ${PROJECT_RESOURCES})
-    add_custom_command(OUTPUT ${WORKPATH}/${RESOURCE}.o WORKING_DIRECTRY ${PROJECT_SOURCE_DIR}
-        COMMAND ${CMAKE_OBJCOPY} ${OBJCOPY_FLAGS} ${RESOURCE} ${WORKPATH}/${RESOURCE}.o
+    set(OBJECT ${WORKPATH}/${RESOURCE}${CMAKE_C_OUTPUT_EXTENSION})
+    add_custom_command(OUTPUT ${OBJECT}
+        COMMAND ${CMAKE_OBJCOPY} ${OBJCOPY_FLAGS} ${RESOURCE} ${OBJECT}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM
     )
-    list(APPEND PROJECT_OBJECTS ${WORKPATH}/${RESOURCE}.o)
-endforeach(RESOURCE)
+    list(APPEND PROJECT_OBJECTS ${OBJECT})
+endforeach()
 
-configure_file(version.hpp.in ${PROJECT_SOURCE_DIR}/../include/${PROJECT_NAME}/version.hpp)
+option(USE_GLFW "Use GLFW as a component" ON)
+
+find_package(X11 QUIET)
+set(WINDOW_SYSTEM_WIN32 ${WIN32})
+set(WINDOW_SYSTEM_X11 ${X11_FOUND})
+
+configure_file(config.hpp.in  ${PROJECT_SOURCE_DIR}/config.hpp )
+configure_file(version.hpp.in ${PROJECT_SOURCE_DIR}/version.hpp)
 configure_file(../Doxyfile.in ${PROJECT_SOURCE_DIR}/../Doxyfile)
 
-# add_executable(${PROJECT_NAME})
-add_library(${PROJECT_NAME} STATIC)
-# add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} ${PROJECT_OBJECTS})
 
 set_target_properties(${PROJECT_NAME}
 PROPERTIES
     CXX_EXTENSIONS NO
-    LINK_FLAGS_RELEASE -s -static
-    IMPORTED_OBJECTS ${PROJECT_OBJECTS}
+    LINK_FLAGS_RELEASE -s
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../bin
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../lib
     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../lib
@@ -97,4 +102,21 @@ PRIVATE
 
 target_sources(${PROJECT_NAME}
 PRIVATE
+    graphics/window.cpp
+    graphene.cpp
 )
+
+if(USE_GLFW)
+    if(BUILD_SHARED_LIBS)
+        find_package(glfw3 3.3 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+            glfw
+        )
+    endif()
+    target_sources(${PROJECT_NAME}
+    PRIVATE
+        graphics/window/glfw.cpp
+        setup/glfw.cpp
+    )
+endif()
