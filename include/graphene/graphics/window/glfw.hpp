@@ -17,7 +17,7 @@ namespace Graphene::Graphics {
  *
  * ウィンドウオブジェクトを生成するためのクラスです。
  */
-class WindowBuilderGLFW : public WindowBuilder {
+class WindowBuilderGLFW final : public WindowBuilder {
 public:
     /**
      * @brief ウィンドウオブジェクトの生成
