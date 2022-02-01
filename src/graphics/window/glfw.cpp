@@ -67,11 +67,19 @@ public:
         glfwPollEvents();
     }
 
-    virtual void Show(void) override {
+    virtual void ShowCursor(void) override {
+        glfwSetInputMode(Window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    virtual void HideCursor(void) override {
+        glfwSetInputMode(Window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    virtual void ShowWindow(void) override {
         glfwShowWindow(Window_);
     }
 
-    virtual void Hide(void) override {
+    virtual void HideWindow(void) override {
         glfwHideWindow(Window_);
     }
 

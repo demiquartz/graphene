@@ -90,13 +90,31 @@ public:
     virtual void PollEvents(void) = 0;
 
     /**
+     * @brief カーソルの表示
+     *
+     * カーソルを表示します。
+     *
+     * @return なし
+     */
+    virtual void ShowCursor(void) = 0;
+
+    /**
+     * @brief カーソルの非表示
+     *
+     * カーソルを非表示にします。
+     *
+     * @return なし
+     */
+    virtual void HideCursor(void) = 0;
+
+    /**
      * @brief ウィンドウの表示
      *
      * ウィンドウを表示します。
      *
      * @return なし
      */
-    virtual void Show(void) = 0;
+    virtual void ShowWindow(void) = 0;
 
     /**
      * @brief ウィンドウの非表示
@@ -105,7 +123,7 @@ public:
      *
      * @return なし
      */
-    virtual void Hide(void) = 0;
+    virtual void HideWindow(void) = 0;
 };
 
 /**
