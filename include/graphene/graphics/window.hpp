@@ -179,16 +179,6 @@ public:
     virtual WindowBuilder& SetClientHeight(std::size_t height) noexcept final;
 
     /**
-     * @brief リフレッシュレートの設定
-     *
-     * リフレッシュレートを設定します。
-     *
-     * @param [in] rate リフレッシュレート
-     * @return 自己参照
-     */
-    virtual WindowBuilder& SetRefreshRate(std::size_t rate) noexcept final;
-
-    /**
      * @brief ウィンドウ表示状態の設定
      *
      * ウィンドウ表示状態を設定します。
@@ -211,7 +201,6 @@ protected:
     std::string TitleName_;
     std::size_t ClientWidth_;
     std::size_t ClientHeight_;
-    std::size_t RefreshRate_;
     bool        Visible_;
 };
 
