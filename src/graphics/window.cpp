@@ -8,9 +8,9 @@
 #include <graphene/graphics/window.hpp>
 #include "../version.hpp"
 
-#define DEFAULT_WINDOW_WIDTH 1280
-#define DEFAULT_WINDOW_HEIGHT 720
-#define DEFAULT_VISIBLE      true
+#define DEFAULT_WIDTH   1280
+#define DEFAULT_HEIGHT   720
+#define DEFAULT_VISIBLE true
 
 namespace Graphene::Graphics {
 
@@ -18,10 +18,10 @@ Window::~Window() {
 }
 
 WindowBuilder::WindowBuilder() noexcept :
-TitleName_   (SYSNAME              ),
-ClientWidth_ (DEFAULT_WINDOW_WIDTH ),
-ClientHeight_(DEFAULT_WINDOW_HEIGHT),
-Visible_     (DEFAULT_VISIBLE      ) {
+TitleName_   (SYSNAME        ),
+ClientWidth_ (DEFAULT_WIDTH  ),
+ClientHeight_(DEFAULT_HEIGHT ),
+Visible_     (DEFAULT_VISIBLE) {
 }
 
 WindowBuilder::~WindowBuilder() {
