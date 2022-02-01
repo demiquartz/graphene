@@ -9,6 +9,7 @@
 #define GRAPHENE_GRAPHICS_WINDOW_HPP
 
 #include <any>
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -21,6 +22,15 @@ namespace Graphene::Graphics {
  */
 class Window {
 public:
+    /**
+     * @brief リサイズコールバック関数オブジェクト
+     *
+     * @param [in] width  リサイズ後のクライアント領域の横幅
+     * @param [in] height リサイズ後のクライアント領域の縦幅
+     * @return なし
+     */
+    using ResizeCallback = std::function<void(std::size_t, std::size_t)>;
+
     /**
      * @brief デストラクタ
      */
@@ -35,6 +45,17 @@ public:
      * @return ウィンドウハンドル
      */
     virtual std::any GetHandle(void) = 0;
+
+    /**
+     * @brief リサイズコールバック関数の設定
+     *
+     * リサイズコールバック関数を設定します。 @n
+     * ウィンドウサイズが変更されたときに呼び出されます。
+     *
+     * @param [in] callback リサイズコールバック関数
+     * @return なし
+     */
+    virtual void SetResizeCallback(const ResizeCallback& callback) = 0;
 
     /**
      * @brief ウィンドウの終了確認

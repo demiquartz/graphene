@@ -30,6 +30,11 @@ public:
             glfwGetError(&description);
             throw std::runtime_error(description);
         }
+        glfwSetWindowUserPointer(Window_, this);
+        glfwSetWindowSizeCallback(Window_, [](GLFWwindow* window, int width, int height) {
+            auto self = static_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
+            if (self && self->ResizeCallback_) self->ResizeCallback_(width, height);
+        });
     }
 
     virtual ~WindowGLFW() override {
@@ -45,6 +50,11 @@ public:
 #endif
         return nullptr;
     }
+
+    virtual void SetResizeCallback(const ResizeCallback& callback) override {
+        ResizeCallback_ = callback;
+    }
+
     virtual bool ShouldClose(void) override {
         return glfwWindowShouldClose(Window_) != GLFW_FALSE;
     }
@@ -66,7 +76,8 @@ public:
     }
 
 private:
-    GLFWwindow* Window_;
+    GLFWwindow*    Window_;
+    ResizeCallback ResizeCallback_;
 };
 
 UniqueWindow WindowBuilderGLFW::Build(void) const {
