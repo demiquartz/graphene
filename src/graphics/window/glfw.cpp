@@ -7,6 +7,7 @@
  */
 #include <graphene/graphics/window/glfw.hpp>
 #include "../../config.hpp"
+
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
