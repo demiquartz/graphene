@@ -11,6 +11,9 @@
 // コンポーネントとしてGLFWを使用
 #cmakedefine01 USE_GLFW
 
+// コンポーネントとしてDirectX11を使用
+#cmakedefine01 USE_DX11
+
 // 使用可能なウィンドウシステムを定義
 #cmakedefine01 WINDOW_SYSTEM_WIN32
 #cmakedefine01 WINDOW_SYSTEM_X11
