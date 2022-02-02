@@ -25,6 +25,19 @@ public:
     virtual ~Renderer();
 
     /**
+     * @brief 背景色の設定
+     *
+     * 背景色を[0.0f,1.0f]の範囲で設定します。
+     *
+     * @param [in] red   赤色
+     * @param [in] greem 緑色
+     * @param [in] blue  青色
+     * @param [in] alpha 透明度
+     * @return なし
+     */
+    virtual void SetClearColor(float red, float green, float blue, float alpha) = 0;
+
+    /**
      * @brief レンダラの終了確認
      *
      * 終了処理が必要か問い合わせます。 @n

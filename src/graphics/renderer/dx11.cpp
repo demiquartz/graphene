@@ -20,7 +20,12 @@ namespace Graphene::Graphics {
 
 class RendererDX11 final : public Renderer {
 public:
-    RendererDX11(UniqueWindow&& window) : Window_(std::move(window)) {
+    RendererDX11(UniqueWindow&& window) :
+    Window_(std::move(window)),
+    ClearColorR_(0.0f),
+    ClearColorG_(0.0f),
+    ClearColorB_(0.0f),
+    ClearColorA_(1.0f) {
         InitializeDX11();
         InitializeDXGI();
         Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
@@ -47,6 +52,13 @@ public:
     virtual ~RendererDX11() override {
     }
 
+    virtual void SetClearColor(float red, float green, float blue, float alpha) override {
+        ClearColorR_ = red;
+        ClearColorG_ = green;
+        ClearColorB_ = blue;
+        ClearColorA_ = alpha;
+    }
+
     virtual bool ShouldQuit(void) override {
         return Window_->ShouldClose();
     }
@@ -56,48 +68,6 @@ public:
     }
 
     virtual void Present(void) override {
-        static std::size_t frame;
-        float color[4];
-        {
-            float h = frame++ % 360;
-            if (h <  60) {
-                color[0] = 1.0f;
-                color[1] = h / 60.0f;
-                color[2] = 0.0f;
-                color[3] = 1.0f;
-            } else
-            if (h < 120) {
-                color[0] = (120.0f - h) / 60.0f;
-                color[1] = 1.0f;
-                color[2] = 0.0f;
-                color[3] = 1.0f;
-            } else
-            if (h < 180) {
-                color[0] = 0.0f;
-                color[1] = 1.0f;
-                color[2] = (h - 120.0f) / 60.0f;
-                color[3] = 1.0f;
-            } else
-            if (h < 240) {
-                color[0] = 0.0f;
-                color[1] = (240.0f - h) / 60.0f;
-                color[2] = 1.0f;
-                color[3] = 1.0f;
-            } else
-            if (h < 300) {
-                color[0] = (h - 240.0f) / 60.0f;
-                color[1] = 0.0f;
-                color[2] = 1.0f;
-                color[3] = 1.0f;
-            } else {
-                color[0] = 1.0f;
-                color[1] = 0.0f;
-                color[2] = (360.0f - h) / 60.0f;
-                color[3] = 1.0f;
-
-            }
-        }
-        DeviceContext_->ClearRenderTargetView(RenderTargetView_.Get(), color);
         auto hr = SwapChain_->Present(1, 0);
         if (FAILED(hr)) {
 #ifndef NDEBUG
@@ -105,6 +75,8 @@ public:
 #endif
         }
         Window_->PollEvents();
+        float clearColor[4] = { ClearColorR_, ClearColorG_, ClearColorB_, ClearColorA_ };
+        DeviceContext_->ClearRenderTargetView(RenderTargetView_.Get(), clearColor);
     }
 
 private:
@@ -191,6 +163,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device>           Device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>    DeviceContext_;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView_;
+    float                                          ClearColorR_;
+    float                                          ClearColorG_;
+    float                                          ClearColorB_;
+    float                                          ClearColorA_;
 };
 
 SharedRenderer RendererBuilderDX11::Build(WindowBuilder& windowBuilder) const {
