@@ -9,11 +9,12 @@
 #include "config.hpp"
 #include "version.hpp"
 
-#ifndef NDEBUG
-#include <iostream>
-#endif
 #if USE_GLFW
 #include "setup/glfw.hpp"
+#endif
+
+#ifndef NDEBUG
+#include <iostream>
 #endif
 
 namespace Graphene {
