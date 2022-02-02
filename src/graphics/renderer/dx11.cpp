@@ -70,9 +70,7 @@ public:
     virtual void Present(void) override {
         auto hr = SwapChain_->Present(1, 0);
         if (FAILED(hr)) {
-#ifndef NDEBUG
-            std::cout << std::hex << "HRESULT: " << hr << std::endl;
-#endif
+            throw std::system_error(hr, std::system_category());
         }
         Window_->PollEvents();
         float clearColor[4] = { ClearColorR_, ClearColorG_, ClearColorB_, ClearColorA_ };
