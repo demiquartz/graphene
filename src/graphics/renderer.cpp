@@ -1,21 +1,21 @@
 /** @file
- * @brief スクリーンマネージャ
+ * @brief グラフィックスレンダラ
  * @author Takaaki Sato
  * @copyright (c) 2022 Demiquartz &lt;info@demiquartz.jp&gt; @n
  * Distributed under the MIT License (See accompanying file LICENSE
  * or copy at https://opensource.org/licenses/MIT)
  */
-#include <graphene/graphics/screen.hpp>
+#include <graphene/graphics/renderer.hpp>
 
 namespace Graphene::Graphics {
 
-Screen::~Screen() {
+Renderer::~Renderer() {
 }
 
-ScreenBuilder::ScreenBuilder() noexcept {
+RendererBuilder::RendererBuilder() noexcept {
 }
 
-ScreenBuilder::~ScreenBuilder() {
+RendererBuilder::~RendererBuilder() {
 }
 
 } // Graphene::Graphics

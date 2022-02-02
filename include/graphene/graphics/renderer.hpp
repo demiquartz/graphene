@@ -1,31 +1,31 @@
 /** @file
- * @brief スクリーンマネージャ
+ * @brief グラフィックスレンダラ
  * @author Takaaki Sato
  * @copyright (c) 2022 Demiquartz &lt;info@demiquartz.jp&gt; @n
  * Distributed under the MIT License (See accompanying file LICENSE
  * or copy at https://opensource.org/licenses/MIT)
  */
-#ifndef GRAPHENE_GRAPHICS_SCREEN_HPP
-#define GRAPHENE_GRAPHICS_SCREEN_HPP
+#ifndef GRAPHENE_GRAPHICS_RENDERER_HPP
+#define GRAPHENE_GRAPHICS_RENDERER_HPP
 
 #include <graphene/graphics/window.hpp>
 
 namespace Graphene::Graphics {
 
 /**
- * @brief スクリーンインタフェース
+ * @brief レンダラインタフェース
  *
- * 画面更新を行うためのインタフェースです。
+ * グラフィックスの描画管理を行うためのインタフェースです。
  */
-class Screen {
+class Renderer {
 public:
     /**
      * @brief デストラクタ
      */
-    virtual ~Screen();
+    virtual ~Renderer();
 
     /**
-     * @brief 画面の終了確認
+     * @brief レンダラの終了確認
      *
      * 終了処理が必要か問い合わせます。 @n
      * trueの場合は終了処理を行ってください。
@@ -33,23 +33,23 @@ public:
      * @retval true  必要
      * @retval false 不要
      */
-    virtual bool ShouldClose(void) = 0;
+    virtual bool ShouldQuit(void) = 0;
 
     /**
-     * @brief 画面の終了取消
+     * @brief レンダラの終了取消
      *
      * 終了処理を取り消します。 @n
-     * ShouldClose()がtrueを返したが、
+     * ShouldQuit()がtrueを返したが、
      * 終了させたくない場合に呼び出してください。
      *
      * @return なし
      */
-    virtual void CancelClose(void) = 0;
+    virtual void CancelQuit(void) = 0;
 
     /**
-     * @brief 画面の更新
+     * @brief フレームバッファの更新
      *
-     * 画面を更新します。
+     * フレームバッファを更新します。
      *
      * @return なし
      */
@@ -57,40 +57,40 @@ public:
 };
 
 /**
- * @brief Screenの固有ポインタ
+ * @brief Rendererの共有ポインタ
  */
-using UniqueScreen = std::unique_ptr<Screen>;
+using SharedRenderer = std::shared_ptr<Renderer>;
 
 /**
- * @brief スクリーンビルダクラス
+ * @brief レンダラビルダクラス
  *
- * スクリーンオブジェクトを生成するための抽象クラスです。
+ * レンダラオブジェクトを生成するための抽象クラスです。
  */
-class ScreenBuilder {
+class RendererBuilder {
 public:
     /**
      * @brief コンストラクタ
      */
-    ScreenBuilder() noexcept;
+    RendererBuilder() noexcept;
 
     /**
      * @brief デストラクタ
      */
-    virtual ~ScreenBuilder();
+    virtual ~RendererBuilder();
 
     /**
-     * @brief スクリーンオブジェクトの生成
+     * @brief レンダラオブジェクトの生成
      *
-     * スクリーンオブジェクトを生成します。 @n
+     * レンダラオブジェクトを生成します。 @n
      * この関数はウィンドウビルダのパラメータを
      * 部分的に変更する場合があります。
      *
      * @param [in] windowBuilder ウィンドウビルダ
-     * @return スクリーンオブジェクト
+     * @return レンダラオブジェクト
      */
-    virtual UniqueScreen Build(WindowBuilder& windowBuilder) const = 0;
+    virtual SharedRenderer Build(WindowBuilder& windowBuilder) const = 0;
 };
 
 } // Graphene::Graphics
 
-#endif // GRAPHENE_GRAPHICS_SCREEN_HPP
+#endif // GRAPHENE_GRAPHICS_RENDERER_HPP

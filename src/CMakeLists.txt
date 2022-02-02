@@ -47,7 +47,7 @@ foreach(RESOURCE ${PROJECT_RESOURCES})
 endforeach()
 
 option(USE_GLFW "Use GLFW as a component" ON)
-option(USE_DXGI "Use DXGI as a component" OFF)
+option(USE_DX11 "Use DX11 as a component" OFF)
 
 find_package(X11 QUIET)
 set(WINDOW_SYSTEM_WIN32 ${WIN32})
@@ -103,7 +103,7 @@ PRIVATE
 
 target_sources(${PROJECT_NAME}
 PRIVATE
-    graphics/screen.cpp
+    graphics/renderer.cpp
     graphics/window.cpp
     graphene.cpp
 )
@@ -123,9 +123,9 @@ if(USE_GLFW)
     )
 endif()
 
-if(USE_DXGI)
+if(USE_DX11)
     target_sources(${PROJECT_NAME}
     PRIVATE
-        graphics/screen/dxgi.cpp
+        graphics/renderer/dx11.cpp
     )
 endif()
