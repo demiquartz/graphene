@@ -8,6 +8,8 @@
 #include <graphene/graphics/renderer/dx11.hpp>
 #include "../../config.hpp"
 
+#include <chrono>
+#include <thread>
 #include <wrl/client.h>
 #include <dxgi1_6.h>
 #include <d3d11.h>
@@ -68,13 +70,19 @@ public:
     }
 
     virtual void Present(void) override {
-        auto hr = SwapChain_->Present(1, 0);
+        auto hr = SwapChain_->Present(1, Active_ ? 0 : DXGI_PRESENT_TEST);
+        Active_ = hr != DXGI_STATUS_OCCLUDED;
         if (FAILED(hr)) {
             throw std::system_error(hr, std::system_category());
         }
         Window_->PollEvents();
-        float clearColor[4] = { ClearColorR_, ClearColorG_, ClearColorB_, ClearColorA_ };
-        DeviceContext_->ClearRenderTargetView(RenderTargetView_.Get(), clearColor);
+        if (Active_) {
+            float clearColor[4] = { ClearColorR_, ClearColorG_, ClearColorB_, ClearColorA_ };
+            DeviceContext_->ClearRenderTargetView(RenderTargetView_.Get(), clearColor);
+        } else {
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(250ms);
+        }
     }
 
 private:
@@ -165,6 +173,7 @@ private:
     float                                          ClearColorG_;
     float                                          ClearColorB_;
     float                                          ClearColorA_;
+    bool                                           Active_;
 };
 
 SharedRenderer RendererBuilderDX11::Build(WindowBuilder& windowBuilder) const {
