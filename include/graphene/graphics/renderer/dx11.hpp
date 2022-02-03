@@ -28,6 +28,7 @@ public:
      *
      * @param [in] windowBuilder ウィンドウビルダ
      * @return レンダラオブジェクト(DX11)
+     * @throw std::system_error オブジェクト生成失敗
      */
     virtual SharedRenderer Build(WindowBuilder& windowBuilder) const override;
 };

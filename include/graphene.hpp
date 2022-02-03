@@ -18,8 +18,8 @@ namespace Graphene {
  * ライブラリを初期化します。 @n
  * 初期化に失敗した場合は例外を送出します。
  *
- * @throw std::exception 初期化失敗
  * @return なし
+ * @throw std::exception 初期化失敗
  */
 void Initialize(void);
 

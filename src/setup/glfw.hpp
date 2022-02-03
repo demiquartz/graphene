@@ -16,8 +16,8 @@ namespace Graphene::Setup {
  * GLFWを初期化します。 @n
  * 初期化に失敗した場合は例外を送出します。
  *
- * @throw std::exception 初期化失敗
  * @return なし
+ * @throw std::runtime_error 初期化失敗
  */
 void InitializeGLFW(void);
 

@@ -25,6 +25,7 @@ public:
      * ウィンドウオブジェクトを生成します。
      *
      * @return ウィンドウオブジェクト(GLFW)
+     * @throw std::runtime_error オブジェクト生成失敗
      */
     virtual UniqueWindow Build(void) const override;
 };
