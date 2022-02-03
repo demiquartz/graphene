@@ -21,6 +21,6 @@ namespace Graphene::Setup {
  */
 void InitializeGLFW(void);
 
-} // Graphene::Setup
+} // namespace Graphene::Setup
 
 #endif // GRAPHENE_SETUP_GLFW_HPP

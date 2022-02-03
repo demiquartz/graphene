@@ -22,4 +22,4 @@ void InitializeGLFW(void) {
     }
 }
 
-} // Graphene::Setup
+} // namespace Graphene::Setup

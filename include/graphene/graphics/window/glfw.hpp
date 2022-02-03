@@ -29,6 +29,6 @@ public:
     virtual UniqueWindow Build(void) const override;
 };
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics
 
 #endif // GRAPHENE_GRAPHICS_WINDOW_GLFW_HPP

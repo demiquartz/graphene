@@ -172,4 +172,4 @@ SharedRenderer RendererBuilderDX11::Build(WindowBuilder& windowBuilder) const {
     return std::make_unique<RendererDX11>(windowBuilder.Build());
 }
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics

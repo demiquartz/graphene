@@ -18,4 +18,4 @@ RendererBuilder::RendererBuilder() noexcept {
 RendererBuilder::~RendererBuilder() {
 }
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics

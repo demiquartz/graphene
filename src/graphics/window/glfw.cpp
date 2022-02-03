@@ -98,4 +98,4 @@ UniqueWindow WindowBuilderGLFW::Build(void) const {
     );
 }
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics

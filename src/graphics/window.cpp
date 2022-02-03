@@ -47,4 +47,4 @@ WindowBuilder& WindowBuilder::SetVisible(bool visible) noexcept {
     return *this;
 }
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics

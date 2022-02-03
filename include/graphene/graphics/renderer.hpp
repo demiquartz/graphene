@@ -104,6 +104,6 @@ public:
     virtual SharedRenderer Build(WindowBuilder& windowBuilder) const = 0;
 };
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics
 
 #endif // GRAPHENE_GRAPHICS_RENDERER_HPP

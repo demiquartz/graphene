@@ -204,6 +204,6 @@ protected:
     bool        Visible_;
 };
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics
 
 #endif // GRAPHENE_GRAPHICS_WINDOW_HPP

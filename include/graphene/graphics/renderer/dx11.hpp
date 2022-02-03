@@ -32,6 +32,6 @@ public:
     virtual SharedRenderer Build(WindowBuilder& windowBuilder) const override;
 };
 
-} // Graphene::Graphics
+} // namespace Graphene::Graphics
 
 #endif // GRAPHENE_GRAPHICS_RENDERER_DX11_HPP
