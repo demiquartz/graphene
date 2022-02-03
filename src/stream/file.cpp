@@ -5,10 +5,10 @@
  * Distributed under the MIT License (See accompanying file LICENSE
  * or copy at https://opensource.org/licenses/MIT)
  */
-#include <cstdio>
-#include <system_error>
-#include <sys/stat.h>
 #include <graphene/stream/file.hpp>
+#include <system_error>
+#include <cstdio>
+#include <sys/stat.h>
 
 namespace Graphene::Stream {
 
