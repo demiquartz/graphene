@@ -70,6 +70,7 @@ PROPERTIES
 
 target_include_directories(${PROJECT_NAME}
 PRIVATE
+    ${PROJECT_SOURCE_DIR}/../half-2.2.0/include
     ${PROJECT_SOURCE_DIR}/../include
 )
 
