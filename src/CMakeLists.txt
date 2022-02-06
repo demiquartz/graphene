@@ -46,6 +46,8 @@ foreach(RESOURCE ${PROJECT_RESOURCES})
     list(APPEND PROJECT_OBJECTS ${OBJECT})
 endforeach()
 
+option(USE_LIBPNG "Use libpng" ON)
+
 option(USE_GLFW "Use GLFW as a component" ON)
 option(USE_DX11 "Use DX11 as a component" OFF)
 
@@ -109,6 +111,13 @@ PRIVATE
     stream/file.cpp
     graphene.cpp
 )
+
+if(USE_LIBPNG)
+    target_sources(${PROJECT_NAME}
+    PRIVATE
+        graphics/image/png.cpp
+    )
+endif()
 
 if(USE_GLFW)
     if(BUILD_SHARED_LIBS)
