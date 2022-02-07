@@ -13,6 +13,16 @@
 namespace Graphene::Graphics {
 
 /**
+ * @brief ブレンドモード列挙型
+ */
+enum BlendMode {
+    BlendModeNone,       ///< 上書き
+    BlendModeAdd,        ///< 加算
+    BlendModeAlpha,      ///< アルファ
+    BlendModePreMulAlpha ///< 乗算済みアルファ
+};
+
+/**
  * @brief レンダラインタフェース
  *
  * グラフィックスの描画管理を行うためのインタフェースです。
@@ -23,6 +33,16 @@ public:
      * @brief デストラクタ
      */
     virtual ~Renderer();
+
+    /**
+     * @brief ブレンドモードの設定
+     *
+     * ブレンドモードを設定します。
+     *
+     * @param [in] mode ブレンドモード
+     * @return なし
+     */
+    virtual void SetBlendMode(BlendMode mode) = 0;
 
     /**
      * @brief 背景色の設定

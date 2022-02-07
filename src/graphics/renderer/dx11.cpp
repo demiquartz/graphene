@@ -77,6 +77,41 @@ public:
     virtual ~RendererDX11() override {
     }
 
+    virtual void SetBlendMode(BlendMode mode) override {
+        D3D11_BLEND_DESC desc;
+        desc.AlphaToCoverageEnable                 = FALSE;
+        desc.IndependentBlendEnable                = FALSE;
+        desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+        desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+        desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+        desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+        desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+        switch (mode) {
+        case BlendModeAdd:
+            desc.RenderTarget[0].BlendEnable = TRUE;
+            desc.RenderTarget[0].SrcBlend    = D3D11_BLEND_ONE;
+            desc.RenderTarget[0].DestBlend   = D3D11_BLEND_ONE;
+            break;
+        case BlendModeAlpha:
+            desc.RenderTarget[0].BlendEnable = TRUE;
+            desc.RenderTarget[0].SrcBlend    = D3D11_BLEND_SRC_ALPHA;
+            desc.RenderTarget[0].DestBlend   = D3D11_BLEND_INV_SRC_ALPHA;
+            break;
+        case BlendModePreMulAlpha:
+            desc.RenderTarget[0].BlendEnable = TRUE;
+            desc.RenderTarget[0].SrcBlend    = D3D11_BLEND_ONE;
+            desc.RenderTarget[0].DestBlend   = D3D11_BLEND_INV_SRC_ALPHA;
+            break;
+        default:
+            desc.RenderTarget[0].BlendEnable = FALSE;
+            desc.RenderTarget[0].SrcBlend    = D3D11_BLEND_ONE;
+            desc.RenderTarget[0].DestBlend   = D3D11_BLEND_ZERO;
+            break;
+        }
+        auto hr = Device_->CreateBlendState(&desc, BlendState_.GetAddressOf());
+        if (SUCCEEDED(hr)) DeviceContext_->OMSetBlendState(BlendState_.Get(), {}, ~0);
+    }
+
     virtual void SetClearColor(float red, float green, float blue, float alpha) override {
         ClearColorR_ = red;
         ClearColorG_ = green;
@@ -277,23 +312,6 @@ public:
             if (FAILED(hr)) return;
         }
 
-        static Microsoft::WRL::ComPtr<ID3D11BlendState> blend;
-        if (!blend) {
-            D3D11_BLEND_DESC desc;
-            desc.AlphaToCoverageEnable                 = FALSE;
-            desc.IndependentBlendEnable                = FALSE;
-            desc.RenderTarget[0].BlendEnable           = TRUE;
-            desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
-            desc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
-            desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-            desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
-            desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
-            desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-            desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-            auto hr = Device_->CreateBlendState(&desc, blend.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
         UINT strides = sizeof(Vertex);
         UINT offsets = 0;
         DeviceContext_->IASetInputLayout(layout.Get());
@@ -303,7 +321,6 @@ public:
         DeviceContext_->PSSetShader(pobject.Get(), nullptr, 0);
         DeviceContext_->PSSetSamplers(0, 1, sampler.GetAddressOf());
         DeviceContext_->PSSetShaderResources(0, 1, textureView.GetAddressOf());
-        DeviceContext_->OMSetBlendState(blend.Get(), {}, ~0);
         DeviceContext_->Draw(4, 0);
     }
 
@@ -385,7 +402,6 @@ private:
         }
     }
 
-private:
     void SetViewport(float width, float height) {
         D3D11_VIEWPORT viewport;
         auto xScale       = width  / VirtualW_;
@@ -404,6 +420,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device>           Device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>    DeviceContext_;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView_;
+    Microsoft::WRL::ComPtr<ID3D11BlendState>       BlendState_;
     float                                          VirtualW_;
     float                                          VirtualH_;
     float                                          ClearColorR_;
