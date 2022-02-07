@@ -38,6 +38,23 @@ public:
     virtual void SetClearColor(float red, float green, float blue, float alpha) = 0;
 
     /**
+     * @brief ビューポートの設定
+     *
+     * ビューポートを設定します。 @n
+     * x,y,width,heightは仮想スクリーン座標系で指定します。 @n
+     * minDepth,maxDepthは[0.0f,1.0f]の範囲で指定します。
+     *
+     * @param [in] x        X座標
+     * @param [in] y        Y座標
+     * @param [in] width    横幅
+     * @param [in] height   縦幅
+     * @param [in] minDepth 最小深度
+     * @param [in] maxDepth 最大深度
+     * @return なし
+     */
+    virtual void SetViewport(float x, float y, float width, float height, float minDepth, float maxDepth) = 0;
+
+    /**
      * @brief レンダラの終了確認
      *
      * 終了処理が必要か問い合わせます。 @n
@@ -67,6 +84,16 @@ public:
      * @return なし
      */
     virtual void Present(void) = 0;
+
+    /**
+     * @brief 動作確認用
+     *
+     * 動作確認用の一時的な実装です。 @n
+     * インターフェースの仕様が決まったら削除します。
+     *
+     * @return なし
+     */
+    virtual void DebugDraw(void) = 0;
 };
 
 /**
@@ -92,6 +119,30 @@ public:
     virtual ~RendererBuilder();
 
     /**
+     * @brief 仮想スクリーン横幅の設定
+     *
+     * 仮想スクリーン横幅を設定します。 @n
+     * 仮想スクリーン座標系は解像度が変化したときに自動でスクリーンサイズにフィットします。 @n
+     * 0を指定した場合Build関数を呼び出した時点でのスクリーン横幅が使用されます。
+     *
+     * @param [in] width 仮想スクリーン横幅
+     * @return 自己参照
+     */
+    virtual RendererBuilder& SetVirtualWidth(std::size_t width) noexcept final;
+
+    /**
+     * @brief 仮想スクリーン縦幅の設定
+     *
+     * 仮想スクリーン縦幅を設定します。 @n
+     * 仮想スクリーン座標系は解像度が変化したときに自動でスクリーンサイズにフィットします。 @n
+     * 0を指定した場合Build関数を呼び出した時点でのスクリーン縦幅が使用されます。
+     *
+     * @param [in] height 仮想スクリーン縦幅
+     * @return 自己参照
+     */
+    virtual RendererBuilder& SetVirtualHeight(std::size_t height) noexcept final;
+
+    /**
      * @brief レンダラオブジェクトの生成
      *
      * レンダラオブジェクトを生成します。 @n
@@ -102,6 +153,10 @@ public:
      * @return レンダラオブジェクト
      */
     virtual SharedRenderer Build(WindowBuilder& windowBuilder) const = 0;
+
+protected:
+    std::size_t VirtualWidth_;
+    std::size_t VirtualHeight_;
 };
 
 } // namespace Graphene::Graphics

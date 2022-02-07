@@ -17,6 +17,9 @@ project(${SysString} VERSION ${VerString})
 set(PROJECT_BRIEF "Cross platform 2d game engine")
 
 set(PROJECT_RESOURCES
+    # 動作確認用シェーダ(後で削除)
+    graphics/shader/hlsl/test.vsh
+    graphics/shader/hlsl/test.psh
 )
 
 if(WIN32)
