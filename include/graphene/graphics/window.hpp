@@ -47,6 +47,24 @@ public:
     virtual std::any GetHandle(void) = 0;
 
     /**
+     * @brief クライアント領域の横幅の取得
+     *
+     * クライアント領域の横幅を取得します。
+     *
+     * @return クライアント領域の横幅
+     */
+    virtual std::size_t GetClientWidth(void) = 0;
+
+    /**
+     * @brief クライアント領域の縦幅の取得
+     *
+     * クライアント領域の縦幅を取得します。
+     *
+     * @return クライアント領域の縦幅
+     */
+    virtual std::size_t GetClientHeight(void) = 0;
+
+    /**
      * @brief リサイズコールバック関数の設定
      *
      * リサイズコールバック関数を設定します。 @n

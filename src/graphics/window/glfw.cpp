@@ -52,6 +52,18 @@ public:
         return nullptr;
     }
 
+    virtual std::size_t GetClientWidth(void) override {
+        int width;
+        glfwGetFramebufferSize(Window_, &width, nullptr);
+        return width;
+    }
+
+    virtual std::size_t GetClientHeight(void) override {
+        int height;
+        glfwGetFramebufferSize(Window_, nullptr, &height);
+        return height;
+    }
+
     virtual void SetResizeCallback(const ResizeCallback& callback) override {
         ResizeCallback_ = callback;
     }
