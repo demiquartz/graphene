@@ -146,19 +146,19 @@ private:
     bool ConvertAndRead(png_structp rp, PixelFormat format) {
         switch (format) {
         case RGBAFP32: return ConvertAndRead<PMA, Detail::rgba_fp32>(rp);
-        case ARGBFP32: return ConvertAndRead<PMA, Detail::argb_fp32>(rp);
+        case BGRAFP32: return ConvertAndRead<PMA, Detail::bgra_fp32>(rp);
         case RGBAFP16: return ConvertAndRead<PMA, Detail::rgba_fp16>(rp);
-        case ARGBFP16: return ConvertAndRead<PMA, Detail::argb_fp16>(rp);
+        case BGRAFP16: return ConvertAndRead<PMA, Detail::bgra_fp16>(rp);
         case RGBAUN16: return ConvertAndRead<PMA, Detail::rgba_un16>(rp);
-        case ARGBUN16: return ConvertAndRead<PMA, Detail::argb_un16>(rp);
+        case BGRAUN16: return ConvertAndRead<PMA, Detail::bgra_un16>(rp);
         case RGBA8888: return ConvertAndRead<PMA, Detail::rgba_8888>(rp);
-        case ARGB8888: return ConvertAndRead<PMA, Detail::argb_8888>(rp);
+        case BGRA8888: return ConvertAndRead<PMA, Detail::bgra_8888>(rp);
         case RGBA4444: return ConvertAndRead<PMA, Detail::rgba_4444>(rp);
-        case ARGB4444: return ConvertAndRead<PMA, Detail::argb_4444>(rp);
+        case BGRA4444: return ConvertAndRead<PMA, Detail::bgra_4444>(rp);
         case RGBA5551: return ConvertAndRead<PMA, Detail::rgba_5551>(rp);
-        case ARGB1555: return ConvertAndRead<PMA, Detail::argb_1555>(rp);
+        case BGRA5551: return ConvertAndRead<PMA, Detail::bgra_5551>(rp);
         case RGBA5650: return ConvertAndRead<PMA, Detail::rgba_5650>(rp);
-        case ARGB0565: return ConvertAndRead<PMA, Detail::argb_0565>(rp);
+        case BGRA5650: return ConvertAndRead<PMA, Detail::bgra_5650>(rp);
         default:       return false;
         }
     }

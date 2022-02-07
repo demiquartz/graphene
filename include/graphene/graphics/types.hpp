@@ -16,21 +16,21 @@ namespace Graphene::Graphics {
 enum PixelFormat {
     XXXX0000, ///< フォーマット未指定
     RGBA0000, ///< RGBAフォーマット(ビット深度未指定)
-    ARGB0000, ///< ARGBフォーマット(ビット深度未指定)
+    BGRA0000, ///< BGRAフォーマット(ビット深度未指定)
     RGBAFP32, ///< 格納方式(FLOAT,LE): RR RR RR RR GG GG GG GG BB BB BB BB AA AA AA AA (hex)
-    ARGBFP32, ///< 格納方式(FLOAT,LE): AA AA AA AA RR RR RR RR GG GG GG GG BB BB BB BB (hex)
+    BGRAFP32, ///< 格納方式(FLOAT,LE): BB BB BB BB GG GG GG GG RR RR RR RR AA AA AA AA (hex)
     RGBAFP16, ///< 格納方式(FLOAT,LE): RR RR GG GG BB BB AA AA (hex)
-    ARGBFP16, ///< 格納方式(FLOAT,LE): AA AA RR RR GG GG BB BB (hex)
+    BGRAFP16, ///< 格納方式(FLOAT,LE): BB BB GG GG RR RR AA AA (hex)
     RGBAUN16, ///< 格納方式(UNORM,LE): RR RR GG GG BB BB AA AA (hex)
-    ARGBUN16, ///< 格納方式(UNORM,LE): AA AA RR RR GG GG BB BB (hex)
+    BGRAUN16, ///< 格納方式(UNORM,LE): BB BB GG GG RR RR AA AA (hex)
     RGBA8888, ///< 格納方式(UNORM,LE): RR GG BB AA (hex)
-    ARGB8888, ///< 格納方式(UNORM,LE): AA RR GG BB (hex)
+    BGRA8888, ///< 格納方式(UNORM,LE): BB GG RR AA (hex)
     RGBA4444, ///< 格納方式(UNORM,LE): BBBBAAAA RRRRGGGG (bin)
-    ARGB4444, ///< 格納方式(UNORM,LE): GGGGBBBB AAAARRRR (bin)
+    BGRA4444, ///< 格納方式(UNORM,LE): RRRRAAAA BBBBGGGG (bin)
     RGBA5551, ///< 格納方式(UNORM,LE): GGBBBBBA RRRRRGGG (bin)
-    ARGB1555, ///< 格納方式(UNORM,LE): GGGBBBBB ARRRRRGG (bin)
+    BGRA5551, ///< 格納方式(UNORM,LE): GGRRRRRA BBBBBGGG (bin)
     RGBA5650, ///< 格納方式(UNORM,LE): GGGBBBBB RRRRRGGG (bin)
-    ARGB0565  ///< 格納方式(UNORM,LE): GGGBBBBB RRRRRGGG (bin)
+    BGRA5650  ///< 格納方式(UNORM,LE): GGGRRRRR BBBBBGGG (bin)
 };
 
 } // namespace Graphene::Graphics
