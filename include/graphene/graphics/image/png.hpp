@@ -18,12 +18,13 @@ namespace Graphene::Graphics {
  *
  * PNG画像を読み込みます。
  *
- * @param [in] stream 入力ストリーム
- * @param [in] format ピクセルフォーマット
+ * @param [in] stream    入力ストリーム
+ * @param [in] format    ピクセルフォーマット
+ * @param [in] burnAlpha アルファを焼き込む
  * @return イメージオブジェクト
  * @throw std::exception オブジェクト生成失敗
  */
-SharedImage LoadImagePNG(Stream::SharedStream stream, PixelFormat format);
+SharedImage LoadImagePNG(Stream::SharedStream stream, PixelFormat format, bool burnAlpha);
 
 } // namespace Graphene::Graphics
 

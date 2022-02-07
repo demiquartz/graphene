@@ -14,7 +14,7 @@ namespace Graphene::Graphics {
 
 class ImagePNG final : public Image {
 public:
-    ImagePNG(Stream::SharedStream stream, PixelFormat format) {
+    ImagePNG(Stream::SharedStream stream, PixelFormat format, bool burnAlpha) {
         auto et = ErrorTypeRuntime;
         auto em = "Failed to create png read structure.";
         auto ip = static_cast<png_infop>(nullptr);
@@ -71,12 +71,12 @@ public:
             format  = Detail::GetConvertibleFormat(format, Format_);
             Stride_ = (Detail::GetBytesPerPixel(format) * Length_[0] + 3) & ~3; // align to 4 bytes
             Image_.resize(Stride_ * Length_[1]);
-            if (format == Format_) {
+            if (format == Format_ && !burnAlpha) {
                 for (std::size_t y = 0, h = Length_[1]; y < h; ++y) {
                     png_read_row(rp, reinterpret_cast<png_bytep>(Image_.data() + y * Stride_), nullptr);
                 }
             } else {
-                if (!ConvertAndRead(rp, format)) {
+                if (burnAlpha ? !ConvertAndRead<true>(rp, format) : !ConvertAndRead<false>(rp, format)) {
                     et = ErrorTypeLogic;
                     png_error(rp, "Unsupported conversion patterns.");
                 }
@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    template<class T>
+    template<bool PMA, class T>
     bool ConvertAndRead(png_structp rp) {
         // TODO: 並列化可能？
         std::vector<png_byte> buffer(Detail::GetBytesPerPixel(Format_) * Length_[0]);
@@ -120,7 +120,7 @@ private:
         case RGBAUN16:
             for (std::size_t y = 0, h = Length_[1]; y < h; ++y) {
                 png_read_row(rp, buffer.data(), nullptr);
-                Detail::ConvertPixelFormat(
+                Detail::ConvertPixelFormat<PMA>(
                     reinterpret_cast<T*>(Image_.data() + y * Stride_),
                     reinterpret_cast<Detail::rgba_un16*>(buffer.data()),
                     Length_[0]
@@ -130,7 +130,7 @@ private:
         case RGBA8888:
             for (std::size_t y = 0, h = Length_[1]; y < h; ++y) {
                 png_read_row(rp, buffer.data(), nullptr);
-                Detail::ConvertPixelFormat(
+                Detail::ConvertPixelFormat<PMA>(
                     reinterpret_cast<T*>(Image_.data() + y * Stride_),
                     reinterpret_cast<Detail::rgba_8888*>(buffer.data()),
                     Length_[0]
@@ -142,22 +142,23 @@ private:
         }
     }
 
+    template<bool PMA>
     bool ConvertAndRead(png_structp rp, PixelFormat format) {
         switch (format) {
-        case RGBAFP32: return ConvertAndRead<Detail::rgba_fp32>(rp);
-        case ARGBFP32: return ConvertAndRead<Detail::argb_fp32>(rp);
-        case RGBAFP16: return ConvertAndRead<Detail::rgba_fp16>(rp);
-        case ARGBFP16: return ConvertAndRead<Detail::argb_fp16>(rp);
-        case RGBAUN16: return ConvertAndRead<Detail::rgba_un16>(rp);
-        case ARGBUN16: return ConvertAndRead<Detail::argb_un16>(rp);
-        case RGBA8888: return ConvertAndRead<Detail::rgba_8888>(rp);
-        case ARGB8888: return ConvertAndRead<Detail::argb_8888>(rp);
-        case RGBA4444: return ConvertAndRead<Detail::rgba_4444>(rp);
-        case ARGB4444: return ConvertAndRead<Detail::argb_4444>(rp);
-        case RGBA5551: return ConvertAndRead<Detail::rgba_5551>(rp);
-        case ARGB1555: return ConvertAndRead<Detail::argb_1555>(rp);
-        case RGBA5650: return ConvertAndRead<Detail::rgba_5650>(rp);
-        case ARGB0565: return ConvertAndRead<Detail::argb_0565>(rp);
+        case RGBAFP32: return ConvertAndRead<PMA, Detail::rgba_fp32>(rp);
+        case ARGBFP32: return ConvertAndRead<PMA, Detail::argb_fp32>(rp);
+        case RGBAFP16: return ConvertAndRead<PMA, Detail::rgba_fp16>(rp);
+        case ARGBFP16: return ConvertAndRead<PMA, Detail::argb_fp16>(rp);
+        case RGBAUN16: return ConvertAndRead<PMA, Detail::rgba_un16>(rp);
+        case ARGBUN16: return ConvertAndRead<PMA, Detail::argb_un16>(rp);
+        case RGBA8888: return ConvertAndRead<PMA, Detail::rgba_8888>(rp);
+        case ARGB8888: return ConvertAndRead<PMA, Detail::argb_8888>(rp);
+        case RGBA4444: return ConvertAndRead<PMA, Detail::rgba_4444>(rp);
+        case ARGB4444: return ConvertAndRead<PMA, Detail::argb_4444>(rp);
+        case RGBA5551: return ConvertAndRead<PMA, Detail::rgba_5551>(rp);
+        case ARGB1555: return ConvertAndRead<PMA, Detail::argb_1555>(rp);
+        case RGBA5650: return ConvertAndRead<PMA, Detail::rgba_5650>(rp);
+        case ARGB0565: return ConvertAndRead<PMA, Detail::argb_0565>(rp);
         default:       return false;
         }
     }
@@ -174,8 +175,8 @@ private:
     PixelFormat            Format_;
 };
 
-SharedImage LoadImagePNG(Stream::SharedStream stream, PixelFormat format) {
-    return std::make_shared<ImagePNG>(stream, format);
+SharedImage LoadImagePNG(Stream::SharedStream stream, PixelFormat format, bool burnAlpha) {
+    return std::make_shared<ImagePNG>(stream, format, burnAlpha);
 }
 
 } // namespace Graphene::Graphics

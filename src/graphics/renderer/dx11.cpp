@@ -149,7 +149,7 @@ public:
 
         static Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
         if (!texture) {
-            auto image = LoadImagePNG(Stream::FileFactory().Open("res/character.png", "r"), RGBAFP16);
+            auto image = LoadImagePNG(Stream::FileFactory().Open("res/character.png", "r"), RGBAFP16, true);
             D3D11_TEXTURE2D_DESC desc;
             desc.Width              = image->Length(0);
             desc.Height             = image->Length(1);

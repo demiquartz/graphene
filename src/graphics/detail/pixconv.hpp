@@ -451,6 +451,39 @@ argb_0565& argb_0565::operator=(const argb_un16& pixel) {
     return *this;
 }
 
+rgba_fp32 BurnAlpha(const rgba_fp32& pixel) {
+    return {
+        pixel.a * pixel.r,
+        pixel.a * pixel.g,
+        pixel.a * pixel.b,
+        pixel.a
+    };
+}
+argb_fp32 BurnAlpha(const argb_fp32& pixel) {
+    return {
+        pixel.a,
+        pixel.a * pixel.r,
+        pixel.a * pixel.g,
+        pixel.a * pixel.b
+    };
+}
+rgba_un16 BurnAlpha(const rgba_un16& pixel) {
+    return {
+        static_cast<_un16>(pixel.a * pixel.r / 0xffff),
+        static_cast<_un16>(pixel.a * pixel.g / 0xffff),
+        static_cast<_un16>(pixel.a * pixel.b / 0xffff),
+        static_cast<_un16>(pixel.a)
+    };
+}
+argb_un16 BurnAlpha(const argb_un16& pixel) {
+    return {
+        static_cast<_un16>(pixel.a),
+        static_cast<_un16>(pixel.a * pixel.r / 0xffff),
+        static_cast<_un16>(pixel.a * pixel.g / 0xffff),
+        static_cast<_un16>(pixel.a * pixel.b / 0xffff)
+    };
+}
+
 /**
  * @brief ピクセルフォーマットの変換
  *
@@ -460,10 +493,16 @@ argb_0565& argb_0565::operator=(const argb_un16& pixel) {
  * @param [in]  src 入力配列
  * @param [in]  n   配列の長さ
  */
-template<class T, class U>
+template<bool PMA, class T, class U>
 void ConvertPixelFormat(T* dst, const U* src, std::size_t n) {
-    for (std::size_t i = 0; i < n; ++i) {
-        *dst++ = static_cast<T::base_type>(*src++);
+    if constexpr (PMA) {
+        for (std::size_t i = 0; i < n; ++i) {
+            *dst++ = BurnAlpha(static_cast<T::base_type>(*src++));
+        }
+    } else {
+        for (std::size_t i = 0; i < n; ++i) {
+            *dst++ = static_cast<T::base_type>(*src++);
+        }
     }
 }
 
