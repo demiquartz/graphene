@@ -50,6 +50,7 @@ public:
     ViewportF_(1.0f) {
         InitializeDX11();
         InitializeDXGI();
+        InitializeShader();
         Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
         SwapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
         Device_->CreateRenderTargetView(backBuffer.Get(), nullptr, RenderTargetView_.GetAddressOf());
@@ -223,86 +224,7 @@ public:
     }
 
     virtual void DebugDraw(void) override {
-        static Microsoft::WRL::ComPtr<ID3DBlob> vshader;
-        if (!vshader) {
-            Microsoft::WRL::ComPtr<ID3DBlob> message;
-            auto hr = D3DCompile(
-                RESOURCE_DATA(graphics_shader_hlsl_test_vsh),
-                RESOURCE_SIZE(graphics_shader_hlsl_test_vsh),
-                "test.vsh",
-                nullptr,
-                nullptr,
-                "vs_main",
-                "vs_5_0",
-                D3DCOMPILE_OPTIMIZATION_LEVEL3,
-                0,
-                vshader.GetAddressOf(),
-                message.GetAddressOf()
-            );
-            if (FAILED(hr)) return;
-#ifndef NDEBUG
-            if (message) {
-                std::cout << std::string(static_cast<const char*>(message->GetBufferPointer()), message->GetBufferSize()) << std::endl;
-            }
-#endif
-        }
-
-        static Microsoft::WRL::ComPtr<ID3DBlob> pshader;
-        if (!pshader) {
-            Microsoft::WRL::ComPtr<ID3DBlob> message;
-            auto hr = D3DCompile(
-                RESOURCE_DATA(graphics_shader_hlsl_test_psh),
-                RESOURCE_SIZE(graphics_shader_hlsl_test_psh),
-                "test.psh",
-                nullptr,
-                nullptr,
-                "ps_main",
-                "ps_5_0",
-                D3DCOMPILE_OPTIMIZATION_LEVEL3,
-                0,
-                pshader.GetAddressOf(),
-                message.GetAddressOf()
-            );
-            if (FAILED(hr)) return;
-#ifndef NDEBUG
-            if (message) {
-                std::cout << std::string(static_cast<const char*>(message->GetBufferPointer()), message->GetBufferSize()) << std::endl;
-            }
-#endif
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
-        if (!layout) {
-            D3D11_INPUT_ELEMENT_DESC vertexDesc[] {
-                { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-                { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-            };
-            auto hr = Device_->CreateInputLayout(
-                vertexDesc,
-                ARRAYSIZE(vertexDesc),
-                vshader->GetBufferPointer(),
-                vshader->GetBufferSize(),
-                layout.GetAddressOf()
-            );
-            if (FAILED(hr)) return;
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11VertexShader> vobject;
-        if (!vobject) {
-            auto hr = Device_->CreateVertexShader(vshader->GetBufferPointer(), vshader->GetBufferSize(), nullptr, vobject.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11PixelShader> pobject;
-        if (!pobject) {
-            auto hr = Device_->CreatePixelShader(pshader->GetBufferPointer(), pshader->GetBufferSize(), nullptr, pobject.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
-        DeviceContext_->IASetInputLayout(layout.Get());
         DeviceContext_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        DeviceContext_->VSSetShader(vobject.Get(), nullptr, 0);
-        DeviceContext_->PSSetShader(pobject.Get(), nullptr, 0);
         DeviceContext_->Draw(4, 0);
     }
 
@@ -382,6 +304,101 @@ private:
         if (FAILED(hr)) {
             throw std::system_error(hr, std::system_category());
         }
+    }
+
+    // TODO: 暫定的に固定パイプラインにするが今後
+    // シェーダオブジェクトで管理できるように変更予定
+    void InitializeShader(void) {
+        Microsoft::WRL::ComPtr<ID3DBlob> vshader;
+        {
+            Microsoft::WRL::ComPtr<ID3DBlob> message;
+            auto hr = D3DCompile(
+                RESOURCE_DATA(graphics_shader_hlsl_test_vsh),
+                RESOURCE_SIZE(graphics_shader_hlsl_test_vsh),
+                "test.vsh",
+                nullptr,
+                nullptr,
+                "vs_main",
+                "vs_5_0",
+                D3DCOMPILE_OPTIMIZATION_LEVEL3,
+                0,
+                vshader.GetAddressOf(),
+                message.GetAddressOf()
+            );
+#ifndef NDEBUG
+            if (message) {
+                std::cout << std::string(static_cast<const char*>(message->GetBufferPointer()), message->GetBufferSize()) << std::endl;
+            }
+#endif
+            if (FAILED(hr)) {
+                throw std::system_error(hr, std::system_category());
+            }
+        }
+
+        Microsoft::WRL::ComPtr<ID3DBlob> pshader;
+        {
+            Microsoft::WRL::ComPtr<ID3DBlob> message;
+            auto hr = D3DCompile(
+                RESOURCE_DATA(graphics_shader_hlsl_test_psh),
+                RESOURCE_SIZE(graphics_shader_hlsl_test_psh),
+                "test.psh",
+                nullptr,
+                nullptr,
+                "ps_main",
+                "ps_5_0",
+                D3DCOMPILE_OPTIMIZATION_LEVEL3,
+                0,
+                pshader.GetAddressOf(),
+                message.GetAddressOf()
+            );
+#ifndef NDEBUG
+            if (message) {
+                std::cout << std::string(static_cast<const char*>(message->GetBufferPointer()), message->GetBufferSize()) << std::endl;
+            }
+#endif
+            if (FAILED(hr)) {
+                throw std::system_error(hr, std::system_category());
+            }
+        }
+
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
+        {
+            D3D11_INPUT_ELEMENT_DESC vertexDesc[] {
+                { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,    0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                { "COLOR",    0, DXGI_FORMAT_R32_FLOAT,       0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            };
+            auto hr = Device_->CreateInputLayout(
+                vertexDesc,
+                ARRAYSIZE(vertexDesc),
+                vshader->GetBufferPointer(),
+                vshader->GetBufferSize(),
+                layout.GetAddressOf()
+            );
+            if (FAILED(hr)) {
+                throw std::system_error(hr, std::system_category());
+            }
+        }
+
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> vobject;
+        {
+            auto hr = Device_->CreateVertexShader(vshader->GetBufferPointer(), vshader->GetBufferSize(), nullptr, vobject.GetAddressOf());
+            if (FAILED(hr)) {
+                throw std::system_error(hr, std::system_category());
+            }
+        }
+
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> pobject;
+        {
+            auto hr = Device_->CreatePixelShader(pshader->GetBufferPointer(), pshader->GetBufferSize(), nullptr, pobject.GetAddressOf());
+            if (FAILED(hr)) {
+                throw std::system_error(hr, std::system_category());
+            }
+        }
+
+        DeviceContext_->IASetInputLayout(layout.Get());
+        DeviceContext_->VSSetShader(vobject.Get(), nullptr, 0);
+        DeviceContext_->PSSetShader(pobject.Get(), nullptr, 0);
     }
 
     void SetViewport(float width, float height) {
