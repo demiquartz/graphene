@@ -10,8 +10,9 @@
 namespace Graphene::Graphics {
 
 TextureDX11::TextureDX11(
-    SharedImage                          image,
-    Microsoft::WRL::ComPtr<ID3D11Device> device
+    Microsoft::WRL::ComPtr<ID3D11Device> device,
+    const SharedImage                    image,
+    AccessMode                           mode
 ) {
     DXGI_FORMAT format;
     switch (image->Format()) {
@@ -24,10 +25,10 @@ TextureDX11::TextureDX11(
     case BGRA5650: format = DXGI_FORMAT_B5G6R5_UNORM;       break;
     default: throw std::runtime_error("GenerateTexture: Unsupported format.");
     }
-    D3D11_SUBRESOURCE_DATA data;
-    data.pSysMem          = image->Data();
-    data.SysMemPitch      = image->Stride();
-    data.SysMemSlicePitch = image->Stride() * image->Length(1);
+    D3D11_SUBRESOURCE_DATA subres;
+    subres.pSysMem          = image->Data();
+    subres.SysMemPitch      = image->Stride();
+    subres.SysMemSlicePitch = image->Stride() * image->Length(1);
     switch (image->Rank()) {
     case 1:
         {
@@ -41,7 +42,7 @@ TextureDX11::TextureDX11(
             desc.CPUAccessFlags     = 0;
             desc.MiscFlags          = 0;
             Microsoft::WRL::ComPtr<ID3D11Texture1D> texture;
-            auto hr = device->CreateTexture1D(&desc, &data, texture.GetAddressOf());
+            auto hr = device->CreateTexture1D(&desc, &subres, texture.GetAddressOf());
             if (FAILED(hr)) throw std::system_error(hr, std::system_category());
             Texture_ = texture;
         }
@@ -70,7 +71,7 @@ TextureDX11::TextureDX11(
             desc.CPUAccessFlags     = 0;
             desc.MiscFlags          = 0;
             Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-            auto hr = device->CreateTexture2D(&desc, &data, texture.GetAddressOf());
+            auto hr = device->CreateTexture2D(&desc, &subres, texture.GetAddressOf());
             if (FAILED(hr)) throw std::system_error(hr, std::system_category());
             Texture_ = texture;
         }
@@ -97,7 +98,7 @@ TextureDX11::TextureDX11(
             desc.CPUAccessFlags     = 0;
             desc.MiscFlags          = 0;
             Microsoft::WRL::ComPtr<ID3D11Texture3D> texture;
-            auto hr = device->CreateTexture3D(&desc, &data, texture.GetAddressOf());
+            auto hr = device->CreateTexture3D(&desc, &subres, texture.GetAddressOf());
             if (FAILED(hr)) throw std::system_error(hr, std::system_category());
             Texture_ = texture;
         }

@@ -26,13 +26,15 @@ public:
     /**
      * @brief コンストラクタ
      *
-     * @param [in] image  イメージオブジェクト
      * @param [in] device デバイス(DX11)
+     * @param [in] image  イメージオブジェクト
+     * @param [in] mode   アクセスモード
      * @throw std::runtime_error オブジェクト生成失敗
      */
     TextureDX11(
-        SharedImage                          image,
-        Microsoft::WRL::ComPtr<ID3D11Device> device
+        Microsoft::WRL::ComPtr<ID3D11Device> device,
+        const SharedImage                    image,
+        AccessMode                           mode
     );
 
     /**

@@ -11,6 +11,16 @@
 namespace Graphene::Graphics {
 
 /**
+ * @brief アクセスモード列挙型
+ */
+enum AccessMode {
+    AccessModeDefault  = 0,      ///< 読み書き不可
+    AccessModeWritable = 1 << 0, ///< 書き込み可能
+    AccessModeReadable = 1 << 1, ///< 読み込み可能
+    AccessModeDynamic  = 1 << 2  ///< 高頻度更新
+};
+
+/**
  * @brief ピクセルフォーマット列挙型
  */
 enum PixelFormat {

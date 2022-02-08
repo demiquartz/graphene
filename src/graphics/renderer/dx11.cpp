@@ -6,10 +6,12 @@
  * or copy at https://opensource.org/licenses/MIT)
  */
 #include <graphene/graphics/renderer/dx11.hpp>
+#include "../buffer/dx11.hpp"
 #include "../texture/dx11.hpp"
 #include "../../config.hpp"
 #include "../../resource.h"
 
+#include <cstring>
 #include <chrono>
 #include <thread>
 #include <wrl/client.h>
@@ -126,10 +128,22 @@ public:
         SetViewport(Window_->GetClientWidth(), Window_->GetClientHeight());
     }
 
-    virtual SharedTexture GenerateTexture(SharedImage image) override {
+    virtual SharedBuffer Allocate(const void* data, std::size_t size, AccessMode mode) override {
+        try {
+            return std::make_shared<BufferDX11>(Device_, data, size, mode);
+        }
+        catch (std::exception&) {
+#ifndef NDEBUG
+            throw;
+#endif
+        }
+        return nullptr;
+    }
+
+    virtual SharedTexture Allocate(const SharedImage image, AccessMode mode) override {
         if (image) {
             try {
-                return std::make_shared<TextureDX11>(image, Device_);
+                return std::make_shared<TextureDX11>(Device_, image, mode);
             }
             catch (std::exception&) {
 #ifndef NDEBUG
@@ -140,12 +154,48 @@ public:
         return nullptr;
     }
 
-    virtual void BindTexture(SharedTexture texture) override {
+    virtual void Bind(SharedBuffer buffer, std::size_t stride) override {
+        auto bufferDX11 = dynamic_cast<BufferDX11*>(buffer.get());
+        if (bufferDX11) {
+            UINT strideDX11 = stride;
+            UINT offsetDX11 = 0;
+            DeviceContext_->IASetVertexBuffers(0, 1, bufferDX11->Buffer_.GetAddressOf(), &strideDX11, &offsetDX11);
+        }
+    }
+
+    virtual void Bind(SharedTexture texture) override {
         auto textureDX11 = dynamic_cast<TextureDX11*>(texture.get());
         if (textureDX11) {
             DeviceContext_->PSSetShaderResources(0, 1, textureDX11->GetTexture().GetAddressOf());
             DeviceContext_->PSSetSamplers       (0, 1, textureDX11->GetSampler().GetAddressOf());
         }
+    }
+
+    virtual bool Read(SharedBuffer buffer, std::size_t offset, void* data, std::size_t size) const override {
+        throw std::logic_error("Unimplemented");
+    }
+
+    virtual bool Write(SharedBuffer buffer, std::size_t offset, const void* data, std::size_t size) override {
+        auto bufferDX11 = dynamic_cast<BufferDX11*>(buffer.get());
+        if (!bufferDX11 || !data || !size) {
+            return false;
+        }
+        auto res = bufferDX11->Buffer_.Get();
+        D3D11_MAPPED_SUBRESOURCE subres;
+        if (FAILED(DeviceContext_->Map(res, 0, D3D11_MAP_WRITE_DISCARD, 0, &subres))) {
+            return false;
+        }
+        std::memcpy(static_cast<std::byte*>(subres.pData) + offset, data, size);
+        DeviceContext_->Unmap(res, 0);
+        return true;
+    }
+
+    virtual bool Read(SharedBuffer texture, SharedImage image) const override {
+        throw std::logic_error("Unimplemented");
+    }
+
+    virtual bool Write(SharedBuffer buffer, const SharedImage image) override {
+        throw std::logic_error("Unimplemented");
     }
 
     virtual bool ShouldQuit(void) override {
@@ -173,34 +223,6 @@ public:
     }
 
     virtual void DebugDraw(void) override {
-        struct Vertex {
-            float pos[4];
-            float tex[2];
-        };
-        Vertex vertexList[] {
-            { { -1.0f,  1.0f, 0.5f, 1.0f }, { 0.0f, 0.0f } },
-            { {  1.0f,  1.0f, 0.5f, 1.0f }, { 1.0f, 0.0f } },
-            { { -1.0f, -1.0f, 0.5f, 1.0f }, { 0.0f, 1.0f } },
-            { {  1.0f, -1.0f, 0.5f, 1.0f }, { 1.0f, 1.0f } }
-        };
-
-        static Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
-        if (!buffer) {
-            D3D11_BUFFER_DESC bufferDesc;
-            bufferDesc.ByteWidth           = sizeof(vertexList);
-            bufferDesc.Usage               = D3D11_USAGE_DEFAULT;
-            bufferDesc.BindFlags           = D3D11_BIND_VERTEX_BUFFER;
-            bufferDesc.CPUAccessFlags      = 0;
-            bufferDesc.MiscFlags           = 0;
-            bufferDesc.StructureByteStride = 0;
-            D3D11_SUBRESOURCE_DATA subResourceData;
-            subResourceData.pSysMem          = vertexList;
-            subResourceData.SysMemPitch      = 0;
-            subResourceData.SysMemSlicePitch = 0;
-            auto hr = Device_->CreateBuffer(&bufferDesc, &subResourceData, buffer.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
         static Microsoft::WRL::ComPtr<ID3DBlob> vshader;
         if (!vshader) {
             Microsoft::WRL::ComPtr<ID3DBlob> message;
@@ -277,10 +299,7 @@ public:
             if (FAILED(hr)) return;
         }
 
-        UINT strides = sizeof(Vertex);
-        UINT offsets = 0;
         DeviceContext_->IASetInputLayout(layout.Get());
-        DeviceContext_->IASetVertexBuffers(0, 1, buffer.GetAddressOf(), &strides, &offsets);
         DeviceContext_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         DeviceContext_->VSSetShader(vobject.Get(), nullptr, 0);
         DeviceContext_->PSSetShader(pobject.Get(), nullptr, 0);
