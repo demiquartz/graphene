@@ -8,6 +8,8 @@
 #ifndef GRAPHENE_GRAPHICS_RENDERER_HPP
 #define GRAPHENE_GRAPHICS_RENDERER_HPP
 
+#include <graphene/graphics/image.hpp>
+#include <graphene/graphics/texture.hpp>
 #include <graphene/graphics/window.hpp>
 
 namespace Graphene::Graphics {
@@ -73,6 +75,27 @@ public:
      * @return なし
      */
     virtual void SetViewport(float x, float y, float width, float height, float minDepth, float maxDepth) = 0;
+
+    /**
+     * @brief テクスチャの生成
+     *
+     * テクスチャを生成します。 @n
+     * 失敗した場合は空のオブジェクトを返します。
+     *
+     * @param [in] image イメージオブジェクト
+     * @return テクスチャオブジェクト
+     */
+    virtual SharedTexture GenerateTexture(SharedImage image) = 0;
+
+    /**
+     * @brief テクスチャのバインド
+     *
+     * 描画に使用するテクスチャをバインドします。
+     *
+     * @param [in] texture テクスチャオブジェクト
+     * @return なし
+     */
+    virtual void BindTexture(SharedTexture texture) = 0;
 
     /**
      * @brief レンダラの終了確認

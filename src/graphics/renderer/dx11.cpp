@@ -6,6 +6,7 @@
  * or copy at https://opensource.org/licenses/MIT)
  */
 #include <graphene/graphics/renderer/dx11.hpp>
+#include "../texture/dx11.hpp"
 #include "../../config.hpp"
 #include "../../resource.h"
 
@@ -19,10 +20,6 @@
 #ifndef NDEBUG
 #include <iostream>
 #endif
-
-// デバッグ用に一時的に追加(後で削除予定)
-#include <graphene/stream/file.hpp>
-#include <graphene/graphics/image/png.hpp>
 
 RESOURCE_EXTERN(graphics_shader_hlsl_test_vsh);
 RESOURCE_EXTERN(graphics_shader_hlsl_test_psh);
@@ -129,6 +126,28 @@ public:
         SetViewport(Window_->GetClientWidth(), Window_->GetClientHeight());
     }
 
+    virtual SharedTexture GenerateTexture(SharedImage image) override {
+        if (image) {
+            try {
+                return std::make_shared<TextureDX11>(image, Device_);
+            }
+            catch (std::exception&) {
+#ifndef NDEBUG
+                throw;
+#endif
+            }
+        }
+        return nullptr;
+    }
+
+    virtual void BindTexture(SharedTexture texture) override {
+        auto textureDX11 = dynamic_cast<TextureDX11*>(texture.get());
+        if (textureDX11) {
+            DeviceContext_->PSSetShaderResources(0, 1, textureDX11->GetTexture().GetAddressOf());
+            DeviceContext_->PSSetSamplers       (0, 1, textureDX11->GetSampler().GetAddressOf());
+        }
+    }
+
     virtual bool ShouldQuit(void) override {
         return Window_->ShouldClose();
     }
@@ -179,60 +198,6 @@ public:
             subResourceData.SysMemPitch      = 0;
             subResourceData.SysMemSlicePitch = 0;
             auto hr = Device_->CreateBuffer(&bufferDesc, &subResourceData, buffer.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-        if (!texture) {
-            auto image = LoadImagePNG(Stream::FileFactory().Open("res/character.png", "r"), RGBAFP16, true);
-            D3D11_TEXTURE2D_DESC desc;
-            desc.Width              = image->Length(0);
-            desc.Height             = image->Length(1);
-            desc.MipLevels          = 1;
-            desc.ArraySize          = 1;
-            desc.Format             = DXGI_FORMAT_R16G16B16A16_FLOAT;
-            desc.SampleDesc.Count   = 1;
-            desc.SampleDesc.Quality = 0;
-            desc.Usage              = D3D11_USAGE_IMMUTABLE;
-            desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE;
-            desc.CPUAccessFlags     = 0;
-            desc.MiscFlags          = 0;
-            D3D11_SUBRESOURCE_DATA subres;
-            subres.pSysMem          = image->Data();
-            subres.SysMemPitch      = image->Stride();
-            subres.SysMemSlicePitch = image->Size();
-            auto hr = Device_->CreateTexture2D(&desc, &subres, texture.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView;
-        if (!textureView) {
-            D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-            desc.Format                    = DXGI_FORMAT_R16G16B16A16_FLOAT;
-            desc.ViewDimension             = D3D11_SRV_DIMENSION_TEXTURE2D;
-            desc.Texture2D.MostDetailedMip = 0;
-            desc.Texture2D.MipLevels       = 1;
-            auto hr = Device_->CreateShaderResourceView(texture.Get(), &desc, textureView.GetAddressOf());
-            if (FAILED(hr)) return;
-        }
-
-        static Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
-        if (!sampler) {
-            D3D11_SAMPLER_DESC desc;
-            desc.Filter         = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-            desc.AddressU       = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.AddressV       = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.AddressW       = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.MipLODBias     = 0;
-            desc.MaxAnisotropy  = 1;
-            desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-            desc.BorderColor[0] = 0.0f;
-            desc.BorderColor[1] = 0.0f;
-            desc.BorderColor[2] = 0.0f;
-            desc.BorderColor[3] = 0.0f;
-            desc.MinLOD         = 0.0f;
-            desc.MaxLOD         = D3D11_FLOAT32_MAX;
-            auto hr = Device_->CreateSamplerState(&desc, sampler.GetAddressOf());
             if (FAILED(hr)) return;
         }
 
@@ -319,8 +284,6 @@ public:
         DeviceContext_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         DeviceContext_->VSSetShader(vobject.Get(), nullptr, 0);
         DeviceContext_->PSSetShader(pobject.Get(), nullptr, 0);
-        DeviceContext_->PSSetSamplers(0, 1, sampler.GetAddressOf());
-        DeviceContext_->PSSetShaderResources(0, 1, textureView.GetAddressOf());
         DeviceContext_->Draw(4, 0);
     }
 

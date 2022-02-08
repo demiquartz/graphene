@@ -141,5 +141,6 @@ if(USE_DX11)
     target_sources(${PROJECT_NAME}
     PRIVATE
         graphics/renderer/dx11.cpp
+        graphics/texture/dx11.cpp
     )
 endif()
