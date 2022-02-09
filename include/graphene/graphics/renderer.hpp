@@ -78,6 +78,16 @@ public:
     virtual void SetViewport(float x, float y, float width, float height, float minDepth, float maxDepth) = 0;
 
     /**
+     * @brief プリミティブトポロジの設定
+     *
+     * プリミティブトポロジを設定します。
+     *
+     * @param [in] topology プリミティブトポロジ
+     * @return なし
+     */
+    virtual void SetPrimitiveTopology(PrimitiveTopology topology) = 0;
+
+    /**
      * @brief バッファの生成
      *
      * バッファを生成します。 @n
@@ -177,6 +187,17 @@ public:
     virtual bool Write(SharedBuffer buffer, const SharedImage image) = 0;
 
     /**
+     * @brief プリミティブの描画
+     *
+     * プリミティブを描画します。
+     *
+     * @param [in] count 頂点数
+     * @param [in] start 開始点
+     * @return なし
+     */
+    virtual void Draw(std::size_t count, std::size_t start) = 0;
+
+    /**
      * @brief レンダラの終了確認
      *
      * 終了処理が必要か問い合わせます。 @n
@@ -206,16 +227,6 @@ public:
      * @return なし
      */
     virtual void Present(void) = 0;
-
-    /**
-     * @brief 動作確認用
-     *
-     * 動作確認用の一時的な実装です。 @n
-     * インターフェースの仕様が決まったら削除します。
-     *
-     * @return なし
-     */
-    virtual void DebugDraw(void) = 0;
 };
 
 /**

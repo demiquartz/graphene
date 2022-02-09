@@ -129,6 +129,43 @@ public:
         SetViewport(Window_->GetClientWidth(), Window_->GetClientHeight());
     }
 
+    virtual void SetPrimitiveTopology(PrimitiveTopology topology) override {
+        D3D11_PRIMITIVE_TOPOLOGY pt;
+        switch (topology) {
+        case PrimitiveTopologyPointList:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+            break;
+        case PrimitiveTopologyLineList:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+            break;
+        case PrimitiveTopologyLineStrip:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+            break;
+        case PrimitiveTopologyTriangleList:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+            break;
+        case PrimitiveTopologyTriangleStrip:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+            break;
+        case PrimitiveTopologyLineListWithAdjacency:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+            break;
+        case PrimitiveTopologyLineStripWithAdjacency:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+            break;
+        case PrimitiveTopologyTriangleListWithAdjacency:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+            break;
+        case PrimitiveTopologyTriangleStripWithAdjacency:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+            break;
+        default:
+            pt = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+            break;
+        }
+        DeviceContext_->IASetPrimitiveTopology(pt);
+    }
+
     virtual SharedBuffer Allocate(const void* data, std::size_t size, AccessMode mode) override {
         try {
             return std::make_shared<BufferDX11>(Device_, data, size, mode);
@@ -199,6 +236,10 @@ public:
         throw std::logic_error("Unimplemented");
     }
 
+    virtual void Draw(std::size_t count, std::size_t start) override {
+        DeviceContext_->Draw(count, start);
+    }
+
     virtual bool ShouldQuit(void) override {
         return Window_->ShouldClose();
     }
@@ -221,11 +262,6 @@ public:
             using namespace std::chrono_literals;
             std::this_thread::sleep_for(250ms);
         }
-    }
-
-    virtual void DebugDraw(void) override {
-        DeviceContext_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        DeviceContext_->Draw(4, 0);
     }
 
 private:

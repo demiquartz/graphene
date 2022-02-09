@@ -21,6 +21,22 @@ enum AccessMode {
 };
 
 /**
+ * @brief プリミティブトポロジ列挙型
+ */
+enum PrimitiveTopology {
+    PrimitiveTopologyPointList,                  ///< ポイントリスト
+    PrimitiveTopologyLineList,                   ///< ラインリスト
+    PrimitiveTopologyLineStrip,                  ///< ラインストリップ
+    PrimitiveTopologyTriangleList,               ///< 三角形リスト
+    PrimitiveTopologyTriangleStrip,              ///< 三角形ストリップ
+    PrimitiveTopologyLineListWithAdjacency,      ///< 隣接情報付きラインリスト
+    PrimitiveTopologyLineStripWithAdjacency,     ///< 隣接情報付きラインストリップ
+    PrimitiveTopologyTriangleListWithAdjacency,  ///< 隣接情報付き三角形リスト
+    PrimitiveTopologyTriangleStripWithAdjacency, ///< 隣接情報付き三角形ストリップ
+    PrimitiveTopologyPatchList                   ///< パッチリスト
+};
+
+/**
  * @brief ピクセルフォーマット列挙型
  */
 enum PixelFormat {
